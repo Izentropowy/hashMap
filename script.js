@@ -189,7 +189,6 @@ let map = HashMap();
 function generateRandomEntries() {
   let numberOfEntries = 13;
   let chars = "abcdefghijklmnopqrstuvwxyz";
-  let arr = Array.from(chars);
   let keys = [];
   let values = [];
 
@@ -197,12 +196,11 @@ function generateRandomEntries() {
     let word = "";
     let wordLength = Math.ceil(Math.random() * 10);
     for (let j = 0; j < wordLength; j++) {
-      let randomChar = chars[Math.floor(Math.random() * arr.length)];
+      let randomChar = chars[Math.floor(Math.random() * chars.length)];
       word += randomChar;
     }
     i % 2 === 0 ? keys.push(word) : values.push(word);
   }
-
   for (let i = 0; i < keys.length; i++) {
     map.set(keys[i], values[i]);
   }
