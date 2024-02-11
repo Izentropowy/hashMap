@@ -1,5 +1,6 @@
 function HashMap() {
   let buckets = new Array(16).fill(null);
+  let loadFactor = 0.75;
 
   function Node(key, value) {
     return {
@@ -11,13 +12,26 @@ function HashMap() {
 
   function hash(key) {
     let hashCode = 0;
-
     const primeNumber = 31;
-    for (let i = 0; i < key.counter; i++) {
+    for (let i = 0; i < key.length; i++) {
       hashCode = primeNumber * hashCode + key.charCodeAt(i);
-      hashCode = hashCode % buckets.counter;
+      hashCode = hashCode % buckets.length;
     }
     return hashCode;
+  }
+
+  function rehash() {
+    let oldEntries = entries();
+    buckets = new Array(buckets.length * 2).fill(null);
+
+    oldEntries.forEach((entry) => {
+      set(entry[0], entry[1]);
+    });
+  }
+
+  function hasReachedLoadFactor() {
+    let currentLambda = length() / buckets.length;
+    return currentLambda > loadFactor;
   }
 
   function set(key, value) {
@@ -32,6 +46,10 @@ function HashMap() {
       }
       if (currentNode.key !== key) currentNode.next = newNode;
       else currentNode.value = value;
+    }
+
+    if (hasReachedLoadFactor()) {
+      rehash();
     }
   }
 
@@ -151,7 +169,9 @@ function HashMap() {
   }
 
   return {
-    buckets,
+    get buckets() {
+      return buckets;
+    },
     set,
     get,
     has,
@@ -166,8 +186,27 @@ function HashMap() {
 
 let map = HashMap();
 
-map.set("bartek", "sylwia");
-map.set("bark", "sylwia");
-map.set("bfwefrk", "sylwia");
-map.set("barhwek", "sylwia");
-map.set("barhwek", "sylwia2");
+function generateRandomEntries() {
+  let numberOfEntries = 13;
+  let chars = "abcdefghijklmnopqrstuvwxyz";
+  let arr = Array.from(chars);
+  let keys = [];
+  let values = [];
+
+  for (let i = 0; i < numberOfEntries * 2; i++) {
+    let word = "";
+    let wordLength = Math.ceil(Math.random() * 10);
+    for (let j = 0; j < wordLength; j++) {
+      let randomChar = chars[Math.floor(Math.random() * arr.length)];
+      word += randomChar;
+    }
+    i % 2 === 0 ? keys.push(word) : values.push(word);
+  }
+
+  for (let i = 0; i < keys.length; i++) {
+    map.set(keys[i], values[i]);
+  }
+}
+
+generateRandomEntries();
+console.log(map.buckets);
